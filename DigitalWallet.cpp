@@ -4,7 +4,7 @@ using namespace std;
 #include "DigitalWallet.hpp"
 #include "PaymentMethod.hpp"
 #include "Account.hpp"
-#include "CreditCard.hpp"
+
 
 DigitalWallet::DigitalWallet(Account account) : account(account){};
 
@@ -28,11 +28,21 @@ void DigitalWallet::addPaymentMethod(PaymentMethod *pm)
         return;
     }
 
+    void DigitalWallet::transferFunds(DigitalWallet &receiver, double amount){
+        bool success = account.withdraw(amount);
+        if(success) {
+            receiver.account.deposit(amount);
+            Transaction* txn = new Transaction("Txn-001", TRANSFER, amount, account.getAccountNumber(), receiver.account.getAccountNumber());
+            txns.push_back(txn);
+            cout << "Transfer successful\n";
+        }
+        cout << "Transfer unsuccessful\n";
+    }
 
 
 int main() {
     int id = 0;
-    Account acc("Poorvi", "000000011282");
+    Account acc("Poorvi", "000000011282", 100000);
     DigitalWallet wallet(acc);
 
     
@@ -47,8 +57,8 @@ int main() {
             string cardnum;
             cout << "Enter Card number\n";
             cin >> cardnum;
-            PaymentMethod* pm1 = new CreditCard(to_string(id), cardnum);
-            wallet.addPaymentMethod(pm1);
+            PaymentMethod* pm1 = new CreditCard(to_string(id));
+            // wallet.addPaymentMethod(pm1);
             break;
         }
         case 3: {
